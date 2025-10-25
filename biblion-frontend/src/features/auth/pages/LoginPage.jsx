@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import '../styles/LoginStyle.css';
 import '../styles/AuthStyle.css';
 
@@ -15,13 +15,22 @@ import {authService} from "../services/AuthService.js";
 // Hooks
 import {useEmailHook} from "../hooks/useEmailHook.js";
 import {usePasswordValidator} from "../hooks/usePasswordValidator.js";
+import {useAuth} from "../hooks/useAuth.js";
 
 const LoginPage = () => {
     const {email, handleEmailChange} = useEmailHook();
     const {password, handlePasswordChange} = usePasswordValidator();
+    const {login, isAuthenticated, loading} = useAuth();
 
     const [isLoading, setIsLoading] = useState(false);
     const [alert, setAlert] = useState({message: "", type: ""});
+
+    // Redirecionar se já estiver logado
+    useEffect(() => {
+        if (!loading && isAuthenticated) {
+            window.location.href = '/home/user/HomePage';
+        }
+    }, [isAuthenticated, loading]);
 
     const submitData = async (event) => {
         event.preventDefault();
@@ -32,11 +41,15 @@ const LoginPage = () => {
         try {
             const response = await authService.authenticate(userData);
 
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('userEmail', response.userEmail);
-            localStorage.setItem('userRole', response.userRole);
+            // Usar o hook de autenticação para fazer login
+            login(response.token, response.userEmail, response.userRole);
 
             setAlert({message: "Login realizado com sucesso", type: "success"});
+            
+            // Redirecionar para a página inicial após login bem-sucedido
+            setTimeout(() => {
+                window.location.href = '/home/user/HomePage';
+            }, 1500);
         } catch (error) {
             setAlert({message: error.message, type: "error"});
         } finally {
@@ -46,50 +59,68 @@ const LoginPage = () => {
 
     return (
         <>
-            {alert.message && (
-                <AlertMessage
-                    message={alert.message}
-                    type={alert.type}
-                    onClose={() => setAlert({message: "", type: ""})}
-                />
-            )}
-
-            <div className="layout">
-                <div className="main-container">
-                    <div className="content-container">
-                        <div className="auth-container">
-                            <form className="auth-form-container" onSubmit={submitData}>
-                                <img src={logo} className="logo" alt="logo"/>
-                                <h1 className="form-title">Login</h1>
-                                <div className="form-footer">
-                                <span className="link">
-                                    Não possui uma conta? <a href="/auth/register">Criar uma conta</a>
-                                </span>
+            {loading ? (
+                <div className="layout">
+                    <div className="main-container">
+                        <div className="content-container">
+                            <div className="auth-container">
+                                <div style={{ textAlign: 'center', padding: '40px' }}>
+                                    <img src={logo} className="logo" alt="logo" style={{ marginBottom: '20px' }}/>
+                                    <h1 className="form-title">Verificando autenticação...</h1>
+                                    <p>Por favor, aguarde.</p>
                                 </div>
-                                <div className="inputs-container">
-                                    <TextInput
-                                        type="email"
-                                        label="E-mail"
-                                        value={email}
-                                        placeholder="Digite seu email"
-                                        onChange={handleEmailChange}/>
-
-                                    <PasswordInput
-                                        label="Senha"
-                                        value={password}
-                                        onChange={handlePasswordChange}/>
-                                </div>
-
-                                <SubmitButton
-                                    text={isLoading ? "Enviando..." : "Entrar"}
-                                    type="submit"
-                                    disabled={isLoading}
-                                />
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            ) : (
+                <>
+                    {alert.message && (
+                        <AlertMessage
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={() => setAlert({message: "", type: ""})}
+                        />
+                    )}
+
+                    <div className="layout">
+                        <div className="main-container">
+                            <div className="content-container">
+                                <div className="auth-container">
+                                    <form className="auth-form-container" onSubmit={submitData}>
+                                        <img src={logo} className="logo" alt="logo"/>
+                                        <h1 className="form-title">Login</h1>
+                                        <div className="form-footer">
+                                        <span className="link">
+                                            Não possui uma conta? <a href="/auth/register">Criar uma conta</a>
+                                        </span>
+                                        </div>
+                                        <div className="inputs-container">
+                                            <TextInput
+                                                type="email"
+                                                label="E-mail"
+                                                value={email}
+                                                placeholder="Digite seu email"
+                                                onChange={handleEmailChange}/>
+
+                                            <PasswordInput
+                                                label="Senha"
+                                                value={password}
+                                                onChange={handlePasswordChange}/>
+                                        </div>
+
+                                        <SubmitButton
+                                            text={isLoading ? "Enviando..." : "Entrar"}
+                                            type="submit"
+                                            disabled={isLoading}
+                                        />
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
         </>
     );
 };

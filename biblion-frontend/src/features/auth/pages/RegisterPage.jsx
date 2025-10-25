@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import logo from "../../../assets/images/logo.png";
 import '../styles/AuthStyle.css';
 import {useNavigate} from "react-router-dom";
@@ -11,13 +11,15 @@ import SubmitButton from "../../shared/components/buttons/SubmitButton.jsx";
 // HOOKS
 import {usePasswordValidator} from "../hooks/usePasswordValidator.js";
 import {useEmailHook} from "../hooks/useEmailHook.js";
+import {useAuth} from "../hooks/useAuth.js";
 
 // SERVICE
 import {authService} from "../services/AuthService.js";
 import AlertMessage from "../../shared/components/alert/AlertMessage.jsx";
 
-const registerPage = () => {
+const RegisterPage = () => {
     const navigate = useNavigate();
+    const {isAuthenticated, loading} = useAuth();
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -29,6 +31,13 @@ const registerPage = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [alert, setAlert] = useState({message: "", type: ""});
+
+    // Redirecionar se já estiver logado
+    useEffect(() => {
+        if (!loading && isAuthenticated) {
+            window.location.href = '/home/user/HomePage';
+        }
+    }, [isAuthenticated, loading]);
 
     const submitData = async (event) => {
         event.preventDefault();
@@ -54,15 +63,31 @@ const registerPage = () => {
 
     return (
         <>
-            {alert.message && (
-                <AlertMessage
-                    message={alert.message}
-                    type={alert.type}
-                    onClose={() => setAlert({message: "", type: ""})}
-                />
-            )}
+            {loading ? (
+                <div className="layout">
+                    <div className="main-container">
+                        <div className="content-container">
+                            <div className="auth-container">
+                                <div style={{ textAlign: 'center', padding: '40px' }}>
+                                    <img src={logo} className="logo" alt="logo" style={{ marginBottom: '20px' }}/>
+                                    <h1 className="form-title">Verificando autenticação...</h1>
+                                    <p>Por favor, aguarde.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    {alert.message && (
+                        <AlertMessage
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={() => setAlert({message: "", type: ""})}
+                        />
+                    )}
 
-            <div className="layout">
+                    <div className="layout">
                 <div className="main-container">
                     <div className="content-container">
                         <div className="auth-container">
@@ -139,7 +164,9 @@ const registerPage = () => {
                     </div>
                 </div>
             </div>
+                </>
+            )}
         </>
     );
 }
-export default registerPage;
+export default RegisterPage;

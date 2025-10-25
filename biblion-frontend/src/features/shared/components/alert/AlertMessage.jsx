@@ -1,7 +1,7 @@
 import {useEffect} from "react";
 import './AlertMessage.css';
 
-const alertMessage = ({message, type, onClose}) => {
+const AlertMessage = ({message, type, onClose}) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             onClose();
@@ -16,4 +16,4 @@ const alertMessage = ({message, type, onClose}) => {
         </div>
     );
 };
-export default alertMessage;
+export default AlertMessage;

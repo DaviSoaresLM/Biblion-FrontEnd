@@ -2,13 +2,18 @@ import React from "react";
 import {BrowserRouter as Router, Route, Routes, Link, Navigate} from "react-router-dom";
 import LoginPage from "./features/auth/pages/LoginPage.jsx";
 import RegisterPage from "./features/auth/pages/RegisterPage.jsx";
+import HomePage from "./features/auth/pages/home/user/HomePage.jsx";
+import MyLibraryPage from "./features/auth/pages/home/user/MyLibraryPage.jsx";
+import WishlistPage from "./features/auth/pages/home/user/WishlistPage.jsx";
 
 function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Navigate to="/auth/login"/>}/>;
-
+                <Route path="/" element={<Navigate to="/home/user/HomePage"/>}/>
+                <Route path="/home/user/HomePage" element={<HomePage/>}/>
+                <Route path="/home/user/MyLibraryPage" element={<MyLibraryPage/>}/>
+                <Route path="/home/user/WishlistPage" element={<WishlistPage/>}/>
                 <Route path="/auth/login" element={<LoginPage/>}/>
                 <Route path="/auth/register" element={<RegisterPage/>}/>
             </Routes>
