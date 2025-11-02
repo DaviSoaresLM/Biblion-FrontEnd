@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth.js';
+import { useNavigate } from 'react-router-dom';
 import '../../../styles/HomePage.css';
 
 // Components
@@ -12,6 +13,7 @@ import { LoadingState, EmptyState, AccessRestricted } from '../../../../shared/c
 
 const MyLibraryPage = () => {
     const { isAuthenticated, user, logout } = useAuth();
+    const navigate = useNavigate();
     const [savedBooks, setSavedBooks] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -36,16 +38,16 @@ const MyLibraryPage = () => {
     const handleWishlistClick = (e) => {
         e.preventDefault();
         if (isAuthenticated) {
-            window.location.href = '/home/user/WishlistPage';
+            navigate('/home/user/WishlistPage');
         } else {
-            window.location.href = '/auth/login';
+            navigate(`/auth/login?next=${encodeURIComponent('/home/user/WishlistPage')}`);
         }
     };
 
     const handleLogout = (e) => {
         e.preventDefault();
         logout();
-        window.location.href = '/auth/login';
+        navigate('/auth/login');
     };
 
     if (!isAuthenticated) {
@@ -65,7 +67,7 @@ const MyLibraryPage = () => {
                         title="Acesso Restrito"
                         message="Você precisa estar logado para acessar sua biblioteca pessoal"
                         actionText="Fazer Login"
-                        actionUrl="/auth/login"
+                        actionUrl={`/auth/login?next=${encodeURIComponent('/home/user/MyLibraryPage')}`}
                     />
                 </MainLayout>
             </PageLayout>

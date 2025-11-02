@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import logo from "../../../assets/images/logo.png";
 import '../styles/AuthStyle.css';
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useLocation} from "react-router-dom";
 
 // COMPONENTS
 import TextInput from "../../shared/components/inputs/TextInput.jsx";
@@ -19,6 +19,9 @@ import AlertMessage from "../../shared/components/alert/AlertMessage.jsx";
 
 const RegisterPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const next = params.get('next') || '/home/user/HomePage';
     const {isAuthenticated, loading} = useAuth();
 
     const [firstName, setFirstName] = useState('');
@@ -35,9 +38,9 @@ const RegisterPage = () => {
     // Redirecionar se já estiver logado
     useEffect(() => {
         if (!loading && isAuthenticated) {
-            window.location.href = '/home/user/HomePage';
+            navigate(next, { replace: true });
         }
-    }, [isAuthenticated, loading]);
+    }, [isAuthenticated, loading, navigate, next]);
 
     const submitData = async (event) => {
         event.preventDefault();
@@ -51,9 +54,10 @@ const RegisterPage = () => {
 
             setAlert({message: response, type: "success"});
 
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 800));
 
-            navigate("/auth/login");
+            // Redireciona para login mantendo o next (para que após o login o usuário volte ao destino)
+            navigate(`/auth/login?next=${encodeURIComponent(next)}`);
         } catch (error) {
             setAlert({message: error.message, type: "error"});
         } finally {

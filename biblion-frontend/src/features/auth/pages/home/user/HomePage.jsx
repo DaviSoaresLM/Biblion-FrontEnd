@@ -16,6 +16,8 @@ import { PageLayout, MainLayout, SectionLayout } from '../../../../shared/compon
 const HomePage = () => {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuth();
+    const [showAuthPrompt, setShowAuthPrompt] = React.useState(false);
+    const [authPromptTarget, setAuthPromptTarget] = React.useState(null); // 'library' | 'wishlist'
     const {
         displayedBooks,
         currentPage,
@@ -35,7 +37,8 @@ const HomePage = () => {
         if (isAuthenticated) {
             navigate('/home/user/MyLibraryPage');
         } else {
-            navigate('/auth/login');
+            setAuthPromptTarget('library');
+            setShowAuthPrompt(true);
         }
     };
 
@@ -44,8 +47,20 @@ const HomePage = () => {
         if (isAuthenticated) {
             navigate('/home/user/WishlistPage');
         } else {
-            navigate('/auth/login');
+            setAuthPromptTarget('wishlist');
+            setShowAuthPrompt(true);
         }
+    };
+
+    const proceedToLogin = () => {
+        setShowAuthPrompt(false);
+        const targetPath = authPromptTarget === 'library' ? '/home/user/MyLibraryPage' : authPromptTarget === 'wishlist' ? '/home/user/WishlistPage' : '/home/user/HomePage';
+        navigate(`/auth/login?next=${encodeURIComponent(targetPath)}`);
+    };
+
+    const cancelAuthPrompt = () => {
+        setShowAuthPrompt(false);
+        setAuthPromptTarget(null);
     };
 
     const handleLogout = (e) => {
@@ -93,6 +108,18 @@ const HomePage = () => {
                         onLoadMore={handleLoadMore}
                     />
                 </SectionLayout>
+                {showAuthPrompt && (
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
+                        <div style={{ background: 'white', borderRadius: 12, padding: 24, maxWidth: 520, width: '90%', boxShadow: '0 12px 40px rgba(0,0,0,0.3)', textAlign: 'center' }}>
+                            <h3 style={{ marginTop: 0 }}>Você não está logado</h3>
+                            <p style={{ color: '#666' }}>Para acessar esta área é necessário fazer login. Deseja ir para a tela de login?</p>
+                            <div style={{ marginTop: 18, display: 'flex', gap: 12, justifyContent: 'center' }}>
+                                <button className="load-more-btn" onClick={proceedToLogin}>Ir para Login</button>
+                                <button className="pagination-btn" onClick={cancelAuthPrompt}>Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </MainLayout>
         </PageLayout>
     );
