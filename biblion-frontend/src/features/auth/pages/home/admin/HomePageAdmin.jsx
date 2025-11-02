@@ -42,7 +42,6 @@ const BooksTable = ({ books, onEdit, onDelete, selectable = false, onSelectToggl
                         <th style={thStyle}>AUTOR</th>
                         <th style={thStyle}>TIPO</th>
                         <th style={thStyle}>ANO</th>
-                        <th style={thStyle}>CÓPIAS DISPONÍVEIS</th>
                         <th style={thStyle}>CÓPIAS EM EMPRÉSTIMO</th>
                         <th style={thStyle}>AÇÕES</th>
                     </tr>
@@ -61,7 +60,6 @@ const BooksTable = ({ books, onEdit, onDelete, selectable = false, onSelectToggl
                             <td style={tdStyle}>{b.author}</td>
                             <td style={tdStyle}>{b.type || b.genre || '-'}</td>
                             <td style={tdStyle}>{b.year || '-'}</td>
-                            <td style={tdStyle}>{(b.copiesAvailable ?? b.copies) || 0}</td>
                             <td style={tdStyle}>{b.copiesLoaned ?? 0}</td>
                             <td style={tdStyle}>
                                 {onEdit && <button className="quick-view-btn" onClick={() => onEdit(b.id)} style={{ marginRight: 8 }}>Editar</button>}
@@ -88,7 +86,7 @@ const AdminMain = () => {
     const [selectedIds, setSelectedIds] = useState(new Set());
 
     // Form state for add/update
-    const [form, setForm] = useState({ isbn: '', title: '', author: '', type: '', year: '', copiesAvailable: 1, copiesLoaned: 0 });
+    const [form, setForm] = useState({ isbn: '', title: '', author: '', type: '', year: '', copiesLoaned: 0, pdf: null, coverFile: null, coverPreview: '', pdfName: '', coverName: '' });
 
     useEffect(() => {
         // Clone initial list so admin actions are local front-end only
@@ -108,6 +106,18 @@ const AdminMain = () => {
 
     const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
+    const handleFileChange = (e) => {
+        const { name, files } = e.target;
+        if (!files || files.length === 0) return;
+        const file = files[0];
+        if (name === 'pdf') {
+            setForm(prev => ({ ...prev, pdf: file, pdfName: file.name }));
+        } else if (name === 'cover') {
+            const preview = URL.createObjectURL(file);
+            setForm(prev => ({ ...prev, coverFile: file, coverPreview: preview, coverName: file.name }));
+        }
+    };
+
     const handleAdd = (e) => {
         e.preventDefault();
         const nextId = books.reduce((max, b) => Math.max(max, b.id || 0), 0) + 1;
@@ -118,12 +128,12 @@ const AdminMain = () => {
             author: form.author || 'Autor desconhecido',
             type: form.type || form.genre || 'Geral',
             year: form.year || '-',
-            copiesAvailable: Number(form.copiesAvailable) || 1,
             copiesLoaned: Number(form.copiesLoaned) || 0,
-            cover: form.cover || `https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=BK${nextId}`
+            cover: form.coverPreview || form.cover || `https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=BK${nextId}`,
+            pdf: form.pdf ? URL.createObjectURL(form.pdf) : undefined
         };
         setBooks(prev => [newBook, ...prev]);
-        setForm({ isbn: '', title: '', author: '', type: '', year: '', copiesAvailable: 1, copiesLoaned: 0 });
+        setForm({ isbn: '', title: '', author: '', type: '', year: '', copiesLoaned: 0, pdf: null, coverFile: null, coverPreview: '' });
         setCurrentTab('listar');
     };
 
@@ -131,16 +141,37 @@ const AdminMain = () => {
         const book = books.find(b => b.id === id);
         if (!book) return;
         setSelectedBookId(id);
-        setForm({ isbn: book.isbn || '', title: book.title || '', author: book.author || '', type: book.type || book.genre || '', year: book.year || '', copiesAvailable: book.copiesAvailable ?? book.copies ?? 1, copiesLoaned: book.copiesLoaned ?? 0 });
+    setForm({ isbn: book.isbn || '', title: book.title || '', author: book.author || '', type: book.type || book.genre || '', year: book.year || '', copiesLoaned: book.copiesLoaned ?? 0, coverPreview: book.cover || '', pdf: book.pdf || null });
         setCurrentTab('atualizar');
     };
 
     const handleUpdate = (e) => {
         e.preventDefault();
         if (selectedBookId == null) return;
-        setBooks(prev => prev.map(b => b.id === selectedBookId ? { ...b, isbn: form.isbn, title: form.title, author: form.author, type: form.type, year: form.year, copiesAvailable: Number(form.copiesAvailable), copiesLoaned: Number(form.copiesLoaned) } : b));
+        setBooks(prev => prev.map(b => {
+            if (b.id !== selectedBookId) return b;
+            const updated = {
+                ...b,
+                isbn: form.isbn,
+                title: form.title,
+                author: form.author,
+                type: form.type,
+                year: form.year,
+                copiesLoaned: Number(form.copiesLoaned)
+            };
+
+            if (form.coverPreview) updated.cover = form.coverPreview;
+
+            if (form.pdf) {
+                // form.pdf might be a File or a string (existing url)
+                updated.pdf = typeof form.pdf === 'string' ? form.pdf : URL.createObjectURL(form.pdf);
+            }
+
+            return updated;
+        }));
+
         setSelectedBookId(null);
-        setForm({ isbn: '', title: '', author: '', type: '', year: '', copiesAvailable: 1, copiesLoaned: 0 });
+        setForm({ isbn: '', title: '', author: '', type: '', year: '', copiesLoaned: 0, pdf: null, coverFile: null, coverPreview: '' });
         setCurrentTab('listar');
     };
 
@@ -174,7 +205,7 @@ const AdminMain = () => {
             <AdminSidebar currentTab={currentTab} setCurrentTab={setCurrentTab} user={{ email: 'admin@admin.com' }} />
 
             <MainLayout>
-                <PageHeader title="Painel Administrativo" subtitle="Gerencie o acervo da biblioteca" />
+                <PageHeader title={<span className="small-title">Painel Administrativo</span>} subtitle="Gerencie o acervo da biblioteca" />
 
                 <SectionLayout>
                     <SectionHeader title="Acervo" subtitle="Gerencie livros: listar, adicionar, atualizar e deletar" />
@@ -219,9 +250,33 @@ const AdminMain = () => {
                                     <div className="search-input-group" style={{ marginBottom: 12 }}>
                                         <input name="type" value={form.type} onChange={handleChange} placeholder="Gênero / Tipo" className="search-input" style={{ maxWidth: 260 }} />
                                         <input name="year" value={form.year} onChange={handleChange} placeholder="Ano" className="search-input" style={{ maxWidth: 140 }} />
-                                        <input name="copiesAvailable" value={form.copiesAvailable} onChange={handleChange} placeholder="Cópias disponíveis" type="number" className="search-input" style={{ maxWidth: 180 }} />
                                         <input name="copiesLoaned" value={form.copiesLoaned} onChange={handleChange} placeholder="Cópias em empréstimo" type="number" className="search-input" style={{ maxWidth: 220 }} />
                                     </div>
+
+                                            <div className="search-input-group file-input" style={{ marginBottom: 12, alignItems: 'center' }}>
+                                                <label className="file-btn">
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <span style={{ fontSize: '0.9rem', color: '#2c3e50' }}>Arquivo PDF</span>
+                                                        <button type="button" className="file-choose-btn" onClick={() => document.getElementById('pdf-input').click()}>Selecionar PDF</button>
+                                                    </div>
+                                                    <span className="file-name">{form.pdfName || 'Nenhum arquivo selecionado'}</span>
+                                                    <input name="pdf" id="pdf-input" type="file" accept="application/pdf" onChange={handleFileChange} className="file-input-el" />
+                                                </label>
+
+                                                <label className="file-btn">
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <span style={{ fontSize: '0.9rem', color: '#2c3e50' }}>Imagem da Capa</span>
+                                                        <button type="button" className="file-choose-btn" onClick={() => document.getElementById('cover-input').click()}>Selecionar imagem</button>
+                                                    </div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                                        <span className="file-name">{form.coverName || 'Nenhuma imagem'}</span>
+                                                        {form.coverPreview && (
+                                                            <img src={form.coverPreview} alt="preview" className="file-preview" />
+                                                        )}
+                                                    </div>
+                                                    <input name="cover" id="cover-input" type="file" accept="image/*" onChange={handleFileChange} className="file-input-el" />
+                                                </label>
+                                            </div>
 
                                     <div style={{ display: 'flex', gap: 12 }}>
                                         <button className="search-button" type="submit">Adicionar Livro</button>
@@ -254,7 +309,6 @@ const AdminMain = () => {
                                             <div className="search-input-group" style={{ marginBottom: 12 }}>
                                                 <input name="type" value={form.type} onChange={handleChange} placeholder="Gênero / Tipo" className="search-input" style={{ maxWidth: 260 }} />
                                                 <input name="year" value={form.year} onChange={handleChange} placeholder="Ano" className="search-input" style={{ maxWidth: 140 }} />
-                                                <input name="copiesAvailable" value={form.copiesAvailable} onChange={handleChange} placeholder="Cópias disponíveis" type="number" className="search-input" style={{ maxWidth: 180 }} />
                                                 <input name="copiesLoaned" value={form.copiesLoaned} onChange={handleChange} placeholder="Cópias em empréstimo" type="number" className="search-input" style={{ maxWidth: 220 }} />
                                             </div>
 

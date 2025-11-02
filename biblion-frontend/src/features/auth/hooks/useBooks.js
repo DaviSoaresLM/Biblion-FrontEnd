@@ -1,4 +1,14 @@
 import { useState, useMemo } from 'react';
+import cursoPython from '../../../assets/images/covers/curso-intensivo-de-python.jpg';
+import decifrando from '../../../assets/images/covers/decifrando-arquitetura-de-dados.jpg';
+import essencialismo from '../../../assets/images/covers/essencialismo-greg-mckeown.jpg';
+import fundamentos from '../../../assets/images/covers/funddamentos-de-engenharia-de-dados.jpg';
+import logicaJs from '../../../assets/images/covers/Llogica-de-programacao-crie-seus-primeiros-programas-usando-javascript.jpg';
+import pythonWes from '../../../assets/images/covers/python-para-analise-de-dados-wes-mckinney.jpg';
+import turmaMonica from '../../../assets/images/covers/turma-monica-lendas-brasileiras.webp';
+import useJava from '../../../assets/images/covers/use-a-cabeca-java.jpg';
+import useJs from '../../../assets/images/covers/use-a-cabeca-javascript.jpg';
+import usePadroes from '../../../assets/images/covers/use-a-cabeca-padroes-de-projetos.jpg';
 
 export const useBooks = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -7,17 +17,17 @@ export const useBooks = () => {
 
     // Lista completa de livros
     const allBooks = [
-        { id: 1, title: "Harry Potter e a Pedra Filosofal", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP1" },
-        { id: 2, title: "Harry Potter e a Câmara Secreta", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP2" },
-        { id: 3, title: "Harry Potter e o Prisioneiro de Azkaban", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP3" },
-        { id: 4, title: "Harry Potter e o Cálice de Fogo", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP4" },
-        { id: 5, title: "Harry Potter e a Ordem da Fênix", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP5" },
-        { id: 6, title: "Harry Potter e o Enigma do Príncipe", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP6" },
-        { id: 7, title: "Harry Potter e as Relíquias da Morte", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP7" },
-        { id: 8, title: "Harry Potter e a Criança Amaldiçoada", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP8" },
-        { id: 9, title: "O Senhor dos Anéis: A Sociedade do Anel", author: "J.R.R. Tolkien", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=LOTR1" },
-        { id: 10, title: "O Senhor dos Anéis: As Duas Torres", author: "J.R.R. Tolkien", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=LOTR2" },
-        { id: 11, title: "O Senhor dos Anéis: O Retorno do Rei", author: "J.R.R. Tolkien", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=LOTR3" },
+        { id: 1, title: "Curso Intensivo de Python", author: "Eric Matthes", cover: cursoPython },
+        { id: 2, title: "Decifrando Arquitetura de Dados", author: "James Serra", cover: decifrando },
+        { id: 3, title: "Essencialismo", author: "Greg McKeown", cover: essencialismo },
+        { id: 4, title: "Fundamentos de Engenharia de Dados", author: "Joe Reis e Matt Housley", cover: fundamentos },
+        { id: 5, title: "Lógica de Programação", author: "Paulo Silveira e Adriano Almeida", cover: logicaJs },
+        { id: 6, title: "Python para Análise de Dados", author: "Wes McKinney", cover: pythonWes },
+        { id: 7, title: "Turma da Mônica: Lendas Brasileiras", author: "Mauricio de Sousa", cover: turmaMonica },
+        { id: 8, title: "Use a Cabeça! Java", author: "Kathy Sierra", cover: useJava },
+        { id: 9, title: "Use a Cabeça! JavaScript", author: "Michael Morrison", cover: useJs },
+        { id: 10, title: "Use a Cabeça! Padrões de Projetos", author: "Eric Freeman", cover: usePadroes },
+        { id: 11, title: "O Senhor dos Anéis: A Sociedade do Anel", author: "J.R.R. Tolkien", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=LOTR1" },
         { id: 12, title: "O Hobbit", author: "J.R.R. Tolkien", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HOBBIT" },
         { id: 13, title: "Percy Jackson e o Ladrão de Raios", author: "Rick Riordan", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=PJ1" },
         { id: 14, title: "Percy Jackson e o Mar de Monstros", author: "Rick Riordan", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=PJ2" },

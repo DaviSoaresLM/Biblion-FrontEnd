@@ -126,6 +126,96 @@
     background-clip: text;
 }
 
+/* Smaller title for admin page when needed */
+.page-header .small-title {
+    font-size: 1.6rem;
+}
+
+/* File input styling to match page look */
+
+.file-btn {
+    background: rgba(255,255,255,0.95);
+    border: 1px solid #e1e8ed;
+    padding: 8px 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.file-btn span {
+    font-size: 0.88rem;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.file-btn .file-input-el {
+    background: transparent;
+    border: none;
+    padding: 4px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.file-btn .file-input-el::-webkit-file-upload-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.file-btn .file-input-el::-moz-file-upload-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.file-input-el { display: none; }
+
+.file-choose-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+
+.file-name {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Make file-input group responsive and aligned */
+.search-input-group.file-input {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.file-preview {
+    width: 80px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e1e8ed;
+}
+
 .page-header p {
     font-size: 1.2rem;
     color: #7f8c8d;

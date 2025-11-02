@@ -57,7 +57,7 @@ const RegisterPage = () => {
             await new Promise(resolve => setTimeout(resolve, 800));
 
             // Redireciona para login mantendo o next (para que após o login o usuário volte ao destino)
-            navigate(`/auth/login?next=${encodeURIComponent(next)}`);
+            navigate(`/login?next=${encodeURIComponent(next)}`);
         } catch (error) {
             setAlert({message: error.message, type: "error"});
         } finally {
@@ -100,7 +100,7 @@ const RegisterPage = () => {
                                 <h1 className="form-title">Criar conta</h1>
                                 <div className="form-footer">
                                 <span className="link">
-                                    Já possui uma conta? <a href="/auth/login">Login</a>
+                                    Já possui uma conta? <a href="/login">Login</a>
                                 </span>
                                 </div>
                                 <div className="inputs-container">

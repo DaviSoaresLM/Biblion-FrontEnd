@@ -42,12 +42,24 @@ const AdminLoginPage = () => {
         const usersJson = localStorage.getItem('biblion_users');
         const users = usersJson ? JSON.parse(usersJson) : [];
         const adminEmail = 'admin@admin.com';
+        const adminPassword = 'admin';
+
+        // Se os campos de email e senha estiverem vazios, confirmar antes de criar
+        if ((!email || email.trim() === '') && (!password || password.trim() === '')) {
+            const confirmMsg = `Nenhum e-mail/senha foram informados.\nDeseja criar um acesso padrão?\n\nE-mail: ${adminEmail}\nSenha: ${adminPassword}`;
+            const ok = window.confirm(confirmMsg);
+            if (!ok) {
+                setAlert({ message: 'Criação de conta admin cancelada.', type: 'info' });
+                return;
+            }
+        }
+
         const exists = users.some(u => u.email === adminEmail && u.role === 'ADMIN');
         if (!exists) {
-            const newUser = { id: (users.reduce((m, u) => Math.max(m, u.id || 0), 0) + 1), email: adminEmail, password: 'admin', firstName: 'Admin', lastName: 'Local', role: 'ADMIN' };
+            const newUser = { id: (users.reduce((m, u) => Math.max(m, u.id || 0), 0) + 1), email: adminEmail, password: adminPassword, firstName: 'Admin', lastName: 'Local', role: 'ADMIN' };
             users.push(newUser);
             localStorage.setItem('biblion_users', JSON.stringify(users));
-            setAlert({ message: `Usuário admin criado: ${adminEmail} / admin`, type: 'success' });
+            setAlert({ message: `Usuário admin criado: ${adminEmail} / ${adminPassword}`, type: 'success' });
         } else {
             setAlert({ message: `Usuário admin já existe: ${adminEmail}`, type: 'success' });
         }

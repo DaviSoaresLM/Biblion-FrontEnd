@@ -7,6 +7,7 @@ import HomePage from "./features/auth/pages/home/user/HomePage.jsx";
 import HomePageAdmin from "./features/auth/pages/home/admin/HomePageAdmin.jsx";
 import MyLibraryPage from "./features/auth/pages/home/user/MyLibraryPage.jsx";
 import WishlistPage from "./features/auth/pages/home/user/WishlistPage.jsx";
+import NotImplementedPage from "./features/shared/pages/NotImplementedPage.jsx";
 
 function App() {
     return (
@@ -17,9 +18,13 @@ function App() {
                 <Route path="/home/user/HomePageAdmin" element={<HomePageAdmin/>}/>
                 <Route path="/home/user/MyLibraryPage" element={<MyLibraryPage/>}/>
                 <Route path="/home/user/WishlistPage" element={<WishlistPage/>}/>
+                <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/auth/login" element={<LoginPage/>}/>
+                <Route path="/admin/login" element={<AdminLoginPage/>}/>
                 <Route path="/auth/admin-login" element={<AdminLoginPage/>}/>
+                <Route path="/not-implemented" element={<NotImplementedPage/>}/>
                 <Route path="/auth/register" element={<RegisterPage/>}/>
+                <Route path="/register" element={<RegisterPage/>}/>
             </Routes>
         </Router>
     );

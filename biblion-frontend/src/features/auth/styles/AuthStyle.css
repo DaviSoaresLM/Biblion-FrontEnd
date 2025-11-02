@@ -106,3 +106,38 @@ span{
     background: rgba(102, 126, 234, 0.08);
     transform: translateY(-2px);
 }
+
+/* Not implemented page styles */
+.not-implemented-box {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+    padding: 2rem;
+    text-align: center;
+    max-width: 36rem;
+    margin: 0 auto;
+}
+
+.not-implemented-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.not-implemented-desc {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.not-implemented-count {
+    font-weight: 700;
+    font-size: 2rem;
+    color: #2b6cb0;
+    margin-top: 0.5rem;
+}
+
+.not-implemented-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}

@@ -1,8 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const BookCard = ({ book, onBookClick, onRemove, showRemoveButton = false }) => {
+    const navigate = useNavigate();
+    const handleClick = () => {
+        if (onBookClick) return onBookClick(book.id);
+        // se nenhum handler for passado, redireciona para página de "não implementado"
+        navigate('/not-implemented');
+    };
+
     return (
-        <article className="book-card" onClick={() => onBookClick && onBookClick(book.id)}>
+        <article className="book-card" onClick={handleClick}>
             <div className="book-cover">
                 <img src={book.cover} alt={book.title} />
                 {showRemoveButton && onRemove && (
