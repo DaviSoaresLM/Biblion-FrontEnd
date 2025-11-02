@@ -1,4 +1,4 @@
-# Biblion  
+# Biblion  - Ambiente de Desenvolvimento
 # 📚 Sistema de Biblioteca Virtual Pública  
 
 Este projeto é o **frontend** de uma plataforma de **biblioteca digital pública**, desenvolvida com **React** e **JavaScript**.  
