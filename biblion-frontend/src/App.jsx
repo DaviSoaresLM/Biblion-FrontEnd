@@ -13,7 +13,7 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Navigate to="/home/user/HomePage"/>}/>
+                <Route path="/" element={<Navigate to="/auth/admin-login"/>}/>
                 <Route path="/home/user/HomePage" element={<HomePage/>}/>
                 <Route path="/home/user/HomePageAdmin" element={<HomePageAdmin/>}/>
                 <Route path="/home/user/MyLibraryPage" element={<MyLibraryPage/>}/>

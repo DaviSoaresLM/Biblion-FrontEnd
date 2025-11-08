@@ -34,22 +34,26 @@ export const useAuth = () => {
         }
     };
 
-    const login = (token, userEmail, userRole) => {
-        localStorage.setItem('token', token);
-        localStorage.setItem('userEmail', userEmail);
-        localStorage.setItem('userRole', userRole);
+    const login = (token, userData) => {
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('userId', userData.id);
+        localStorage.setItem('userFullName', userData.name);
+        localStorage.setItem('userEmail', userData.email);
+        localStorage.setItem('userRole', userData.role);
         
         setIsAuthenticated(true);
         setUser({
-            email: userEmail,
-            role: userRole
+            email: userData.email,
+            role: userData.role,
         });
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('accessToken');
         localStorage.removeItem('userEmail');
+        localStorage.removeItem('userId');
         localStorage.removeItem('userRole');
+        localStorage.removeItem('userFullName');
         
         setIsAuthenticated(false);
         setUser(null);

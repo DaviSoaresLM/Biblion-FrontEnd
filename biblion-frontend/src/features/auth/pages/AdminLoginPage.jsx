@@ -24,9 +24,11 @@ const AdminLoginPage = () => {
         setIsLoading(true);
         try {
             const response = await authService.authenticate({ email, password });
+
             // checa role
-            if (response.userRole && response.userRole.toUpperCase() === 'ADMIN') {
-                login(response.token, response.userEmail, response.userRole);
+            if (response.userData.role && response.userData.role === 'ADMIN') {
+                login(response.token, response.userData);
+
                 navigate('/home/user/HomePageAdmin');
             } else {
                 setAlert({ message: 'Usuário não tem permissão de administrador.', type: 'error' });
@@ -35,33 +37,6 @@ const AdminLoginPage = () => {
             setAlert({ message: err.message || 'Erro ao autenticar', type: 'error' });
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const seedAdmin = () => {
-        const usersJson = localStorage.getItem('biblion_users');
-        const users = usersJson ? JSON.parse(usersJson) : [];
-        const adminEmail = 'admin@admin.com';
-        const adminPassword = 'admin';
-
-        // Se os campos de email e senha estiverem vazios, confirmar antes de criar
-        if ((!email || email.trim() === '') && (!password || password.trim() === '')) {
-            const confirmMsg = `Nenhum e-mail/senha foram informados.\nDeseja criar um acesso padrão?\n\nE-mail: ${adminEmail}\nSenha: ${adminPassword}`;
-            const ok = window.confirm(confirmMsg);
-            if (!ok) {
-                setAlert({ message: 'Criação de conta admin cancelada.', type: 'info' });
-                return;
-            }
-        }
-
-        const exists = users.some(u => u.email === adminEmail && u.role === 'ADMIN');
-        if (!exists) {
-            const newUser = { id: (users.reduce((m, u) => Math.max(m, u.id || 0), 0) + 1), email: adminEmail, password: adminPassword, firstName: 'Admin', lastName: 'Local', role: 'ADMIN' };
-            users.push(newUser);
-            localStorage.setItem('biblion_users', JSON.stringify(users));
-            setAlert({ message: `Usuário admin criado: ${adminEmail} / ${adminPassword}`, type: 'success' });
-        } else {
-            setAlert({ message: `Usuário admin já existe: ${adminEmail}`, type: 'success' });
         }
     };
 
@@ -101,10 +76,6 @@ const AdminLoginPage = () => {
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
                                             <button type="button" className="secondary-button" onClick={() => navigate('/home/user/HomePage')}>Cancelar</button>
                                         </div>
-                                    </div>
-
-                                    <div style={{ marginTop: 12, display: 'flex', justifyContent: 'center' }}>
-                                        <button type="button" className="pagination-btn" onClick={seedAdmin}>Criar conta Admin de teste</button>
                                     </div>
                                 </div>
                             </form>

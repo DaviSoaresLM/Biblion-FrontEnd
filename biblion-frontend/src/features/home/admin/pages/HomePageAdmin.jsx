@@ -54,6 +54,7 @@ const BooksTable = ({ books, onEdit, onDelete, selectable = false, onSelectToggl
                                     <input type="checkbox" checked={selectedIds.has(b.id)} onChange={() => onSelectToggle && onSelectToggle(b.id)} />
                                 </td>
                             )}
+                            
                             <td style={tdStyle}>{b.id}</td>
                             <td style={tdStyle}>{b.isbn || '-'}</td>
                             <td style={tdStyle}>{b.title}</td>
@@ -87,11 +88,6 @@ const AdminMain = () => {
 
     // Form state for add/update
     const [form, setForm] = useState({ isbn: '', title: '', author: '', type: '', year: '', copiesLoaned: 0, pdf: null, coverFile: null, coverPreview: '', pdfName: '', coverName: '' });
-
-    useEffect(() => {
-        // Clone initial list so admin actions are local front-end only
-        setBooks(allBooks.map(b => ({ ...b })));
-    }, [allBooks]);
 
     const genres = useMemo(() => {
         const set = new Set(books.map(b => b.type || b.genre).filter(Boolean));
