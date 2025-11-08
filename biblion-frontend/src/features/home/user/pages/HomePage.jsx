@@ -1,17 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../hooks/useAuth.js';
-import { useBooks } from '../../../hooks/useBooks.js';
-import '../../../styles/HomePage.css';
+import { useAuth } from '../../../auth/hooks/useAuth.js';
+import { useBooks } from '../../../home/hooks/useBooks.js';
+import '../../../shared/styles/HomePage.css';
 
 // Components
-import Sidebar from '../../../../shared/components/layout/Sidebar.jsx';
-import PageHeader from '../../../../shared/components/layout/PageHeader.jsx';
-import SearchSection from '../../../../shared/components/search/SearchSection.jsx';
-import SectionHeader from '../../../../shared/components/layout/SectionHeader.jsx';
-import BooksGrid from '../../../../shared/components/books/BooksGrid.jsx';
-import Pagination from '../../../../shared/components/navigation/Pagination.jsx';
-import { PageLayout, MainLayout, SectionLayout } from '../../../../shared/components/layout/LayoutComponents.jsx';
+import Sidebar from '../../../shared/components/layout/Sidebar.jsx';
+import PageHeader from '../../../shared/components/layout/PageHeader.jsx';
+import SearchSection from '../../../shared/components/search/SearchSection.jsx';
+import SectionHeader from '../../../shared/components/layout/SectionHeader.jsx';
+import BooksGrid from '../../../shared/components/books/BooksGrid.jsx';
+import Pagination from '../../../shared/components/navigation/Pagination.jsx';
+import { PageLayout, MainLayout, SectionLayout } from '../../../shared/components/layout/LayoutComponents.jsx';
 
 const HomePage = () => {
     const navigate = useNavigate();

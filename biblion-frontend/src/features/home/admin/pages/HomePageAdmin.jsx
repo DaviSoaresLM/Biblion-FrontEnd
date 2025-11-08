@@ -1,13 +1,13 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import '../../../styles/HomePage.css';
+import '../../../shared/styles/HomePage.css';
 
 // Layout components
-import { PageLayout, MainLayout, SidebarLayout, SectionLayout } from '../../../../shared/components/layout/LayoutComponents.jsx';
-import PageHeader from '../../../../shared/components/layout/PageHeader.jsx';
-import SectionHeader from '../../../../shared/components/layout/SectionHeader.jsx';
-import { useBooks } from '../../../hooks/useBooks.js';
+import { PageLayout, MainLayout, SidebarLayout, SectionLayout } from '../../../shared/components/layout/LayoutComponents.jsx';
+import PageHeader from '../../../shared/components/layout/PageHeader.jsx';
+import SectionHeader from '../../../shared/components/layout/SectionHeader.jsx';
+import { useBooks } from '../../../home/hooks/useBooks.js';
 
-import { SidebarHeader, SidebarFooter } from '../../../../shared/components/layout/SidebarComponents.jsx';
+import { SidebarHeader, SidebarFooter } from '../../../shared/components/layout/SidebarComponents.jsx';
 
 const AdminSidebar = ({ currentTab, setCurrentTab, user }) => {
     return (

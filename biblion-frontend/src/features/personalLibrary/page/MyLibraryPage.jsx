@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../hooks/useAuth.js';
+import { useAuth } from '../../auth/hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
-import '../../../styles/HomePage.css';
+import '../../shared/styles/Homepage.css';
 
 // Components
-import Sidebar from '../../../../shared/components/layout/Sidebar.jsx';
-import PageHeader from '../../../../shared/components/layout/PageHeader.jsx';
-import SectionHeader from '../../../../shared/components/layout/SectionHeader.jsx';
-import BooksGrid from '../../../../shared/components/books/BooksGrid.jsx';
-import { PageLayout, MainLayout, SectionLayout } from '../../../../shared/components/layout/LayoutComponents.jsx';
-import { LoadingState, EmptyState, AccessRestricted } from '../../../../shared/components/content/ContentComponents.jsx';
+import Sidebar from '../../shared/components/layout/Sidebar.jsx';
+import PageHeader from '../../shared/components/layout/PageHeader.jsx';
+import SectionHeader from '../../shared/components/layout/SectionHeader.jsx';
+import BooksGrid from '../../shared/components/books/BooksGrid.jsx';
+import { PageLayout, MainLayout, SectionLayout } from '../../shared/components/layout/LayoutComponents.jsx';
+import { LoadingState, EmptyState, AccessRestricted } from '../../shared/components/content/ContentComponents.jsx';
 
 const MyLibraryPage = () => {
     const { isAuthenticated, user, logout } = useAuth();
