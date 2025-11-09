@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
 import { BookService } from '../services/BookService.js';
-import { booksCatalog } from '../data/booksCatalog.js';
 
 export const useBooks = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -9,7 +8,7 @@ export const useBooks = () => {
     const [allBooks, setAllBooks] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Carrega livros via o serviço; se o backend retornar vazio ou falhar, usa o catálogo local
+    // Carrega livros via o serviço (backend). Em caso de erro a lista ficará vazia.
     useEffect(() => {
         let mounted = true;
         setLoading(true);
@@ -18,16 +17,11 @@ export const useBooks = () => {
             try {
                 const list = await BookService.listBooks({ delay: 0 });
                 if (!mounted) return;
-                // Se o backend responder com lista vazia, use catálogo local como fallback
-                if (!list || (Array.isArray(list) && list.length === 0)) {
-                    setAllBooks(booksCatalog.slice());
-                } else {
-                    setAllBooks(list || []);
-                }
+                setAllBooks(Array.isArray(list) ? list : []);
             } catch (err) {
                 if (!mounted) return;
                 // Em caso de erro de rede ou outro problema, caímos para o catálogo local
-                setAllBooks(booksCatalog.slice());
+                setAllBooks([]);
             } finally {
                 if (mounted) setLoading(false);
             }

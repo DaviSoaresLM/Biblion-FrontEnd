@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
 import '../../shared/styles/HomePage.css';
+import api from '../../../config/AxiosConfig.jsx';
 
 // Components
 import Sidebar from '../../shared/components/layout/Sidebar.jsx';
@@ -17,18 +18,23 @@ const DownloadHistoryPage = () => {
     const [history, setHistory] = useState([]);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            // carregar histórico mock
-            setTimeout(() => {
-                const mock = [
-                    { id: 1, fileName: 'curso-intensivo-de-python.pdf', bookTitle: 'Curso Intensivo de Python', date: '2025-10-01 14:22', size: '2.1 MB' },
-                    { id: 2, fileName: 'use-a-cabeca-javascript.pdf', bookTitle: 'Use a Cabeça! JavaScript', date: '2025-09-20 09:10', size: '1.6 MB' },
-                    { id: 3, fileName: 'fundamentos-de-engenharia.pdf', bookTitle: 'Fundamentos de Engenharia de Dados', date: '2025-08-13 18:45', size: '3.8 MB' }
-                ];
-                setHistory(mock);
-                setLoading(false);
-            }, 300);
-        }
+        let mounted = true;
+        (async () => {
+            if (!isAuthenticated) return;
+            try {
+                // Tenta carregar histórico do backend; endpoint esperado: GET /api/user/downloads
+                const res = await api.get('/api/user/downloads');
+                if (!mounted) return;
+                setHistory(Array.isArray(res.data) ? res.data : []);
+            } catch (err) {
+                console.warn('Não foi possível carregar histórico de downloads do backend:', err?.message || err);
+                if (mounted) setHistory([]);
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        })();
+
+        return () => { mounted = false; };
     }, [isAuthenticated]);
 
     const handleLogout = (e) => {

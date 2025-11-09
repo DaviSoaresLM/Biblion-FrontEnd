@@ -43,76 +43,30 @@ const useAdminBooks = ({ initialDelay = 0 } = {}) => {
         setBooks(all.map(b => ({ ...b })));
     };
     const addBook = async (bookPayload) => {
-        // Tenta criar via backend usando BookService; se falhar, faz fallback local.
-        try {
-            const created = await BookService.create(bookPayload);
-            if (created && (created.id || created.title)) {
-                setBooks(prev => [created, ...prev]);
-                return created;
-            }
-        } catch (err) {
-            console.warn('BookService.create falhou, usando fallback local', err);
+        // Chama o backend para criar o livro e atualiza o estado local com a resposta.
+        const created = await BookService.create(bookPayload);
+        if (created && (created.id || created.title)) {
+            setBooks(prev => [created, ...prev]);
+            return created;
         }
-
-        // Fallback local: criamos um id incremental.
-        const nextId = books.reduce((max, b) => Math.max(max, b.id || 0), 0) + 1;
-        const newBook = {
-            id: nextId,
-            isbn: bookPayload.isbn || `ISBN-${nextId}`,
-            title: bookPayload.title || 'Título sem nome',
-            author: bookPayload.author || 'Autor desconhecido',
-            type: bookPayload.type || bookPayload.genre || 'Geral',
-            year: bookPayload.year || '-',
-            copiesLoaned: Number(bookPayload.copiesLoaned) || 0,
-            cover: bookPayload.coverPreview || bookPayload.cover || `https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=BK${nextId}`,
-            pdf: bookPayload.pdf ? (typeof bookPayload.pdf === 'string' ? bookPayload.pdf : URL.createObjectURL(bookPayload.pdf)) : undefined
-        };
-
-        setBooks(prev => [newBook, ...prev]);
-        return newBook;
+        // Se o servidor não retornar o novo recurso, lançamos erro para o chamador tratar.
+        throw new Error('Resposta inválida ao criar livro');
     };
 
     const updateBook = async (id, bookPayload) => {
-        // Integração: tenta chamar BookService.update(id, payload), com fallback local
-        try {
-            const updatedFromServer = await BookService.update(id, bookPayload);
-            if (updatedFromServer) {
-                setBooks(prev => prev.map(b => (b.id === id ? { ...b, ...updatedFromServer } : b)));
-                return updatedFromServer;
-            }
-        } catch (err) {
-            console.warn('BookService.update falhou, usando fallback local', err);
+        // Atualiza via backend e aplica o resultado ao estado local.
+        const updatedFromServer = await BookService.update(id, bookPayload);
+        if (updatedFromServer) {
+            setBooks(prev => prev.map(b => (b.id === id ? { ...b, ...updatedFromServer } : b)));
+            return updatedFromServer;
         }
-
-        setBooks(prev => prev.map(b => {
-            if (b.id !== id) return b;
-            const updated = {
-                ...b,
-                isbn: bookPayload.isbn,
-                title: bookPayload.title,
-                author: bookPayload.author,
-                type: bookPayload.type,
-                year: bookPayload.year,
-                copiesLoaned: Number(bookPayload.copiesLoaned)
-            };
-
-            if (bookPayload.coverPreview) updated.cover = bookPayload.coverPreview;
-            if (bookPayload.pdf) updated.pdf = typeof bookPayload.pdf === 'string' ? bookPayload.pdf : URL.createObjectURL(bookPayload.pdf);
-
-            return updated;
-        }));
+        throw new Error('Resposta inválida ao atualizar livro');
     };
 
     const deleteBook = async (id) => {
-        // Tenta deletar no backend; se falhar, remove localmente.
-        try {
-            await BookService.deletebooks(id);
-            setBooks(prev => prev.filter(b => b.id !== id));
-        } catch (err) {
-            console.warn('BookService.deletebooks falhou, removendo localmente', err);
-            setBooks(prev => prev.filter(b => b.id !== id));
-        }
-
+        // Deleta no backend e atualiza estado local apenas se sucesso.
+        await BookService.deletebooks(id);
+        setBooks(prev => prev.filter(b => b.id !== id));
         setSelectedIds(prev => {
             const copy = new Set(prev);
             copy.delete(id);
@@ -122,16 +76,10 @@ const useAdminBooks = ({ initialDelay = 0 } = {}) => {
 
     const bulkDelete = async (idsSet) => {
         // idsSet: Set<number>
-        // Tenta deletar cada um no backend; mesmo em caso de falha removemos localmente para consistência na UI.
         const ids = Array.from(idsSet);
         await Promise.all(ids.map(async (id) => {
-            try {
-                await BookService.deletebooks(id);
-            } catch (err) {
-                console.warn(`Falha ao deletar ${id} no servidor:`, err);
-            }
+            await BookService.deletebooks(id);
         }));
-
         setBooks(prev => prev.filter(b => !idsSet.has(b.id)));
         setSelectedIds(new Set());
     };
