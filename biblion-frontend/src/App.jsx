@@ -5,9 +5,11 @@ import AdminLoginPage from "./features/auth/pages/AdminLoginPage.jsx";
 import RegisterPage from "./features/auth/pages/RegisterPage.jsx";
 import HomePage from "./features/home/user/pages/HomePage.jsx";
 import HomePageAdmin from "./features/home/admin/pages/HomePageAdmin.jsx";
-import MyLibraryPage from "./features/personalLibrary/page/MyLibraryPage.jsx";
+import MyLibraryPage from "./features/personalLibrary/pages/MyLibraryPage.jsx";
 import WishlistPage from "./features/wishlist/pages/WishlistPage.jsx";
 import NotImplementedPage from "./features/shared/pages/NotImplementedPage.jsx";
+import BookDetailsPage from "./features/home/pages/BookDetailsPage.jsx";
+import DownloadHistoryPage from "./features/personalLibrary/pages/DownloadHistoryPage.jsx";
 
 function App() {
     return (
@@ -23,6 +25,8 @@ function App() {
                 <Route path="/admin/login" element={<AdminLoginPage/>}/>
                 <Route path="/auth/admin-login" element={<AdminLoginPage/>}/>
                 <Route path="/not-implemented" element={<NotImplementedPage/>}/>
+                <Route path="/book/:id" element={<BookDetailsPage/>}/>
+                <Route path="/home/user/DownloadHistoryPage" element={<DownloadHistoryPage/>}/>
                 <Route path="/auth/register" element={<RegisterPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
             </Routes>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth.js';
+import { useBooks } from '../../home/hooks/useBooks.js';
 import { useNavigate } from 'react-router-dom';
-import '../../shared/styles/Homepage.css';
+import '../../shared/styles/HomePage.css';
 
 // Components
 import Sidebar from '../../shared/components/layout/Sidebar.jsx';
@@ -14,6 +15,7 @@ import { LoadingState, EmptyState, AccessRestricted } from '../../shared/compone
 const WishlistPage = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
+    const { allBooks } = useBooks();
     const [wishlistBooks, setWishlistBooks] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -25,14 +27,20 @@ const WishlistPage = () => {
 
     const loadWishlistBooks = () => {
         setTimeout(() => {
-            const mockWishlistBooks = [
-                { id: 4, title: "Harry Potter e o Cálice de Fogo", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP4", addedDate: "2024-01-20" },
-                { id: 9, title: "O Senhor dos Anéis: A Sociedade do Anel", author: "J.R.R. Tolkien", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=LOTR1", addedDate: "2024-01-18" },
-                { id: 13, title: "Percy Jackson e o Ladrão de Raios", author: "Rick Riordan", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=PJ1", addedDate: "2024-01-15" },
-                { id: 21, title: "Jogos Vorazes", author: "Suzanne Collins", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HG1", addedDate: "2024-01-12" },
-                { id: 24, title: "A Canção do Assassino", author: "Patrick Rothfuss", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=KKC1", addedDate: "2024-01-10" }
-            ];
-            setWishlistBooks(mockWishlistBooks);
+            // Construir wishlist diretamente a partir do catálogo (ids escolhidos com capas locais)
+            const wishlistIds = [4, 9, 13, 7, 8]; // 4: Fundamentos, 9: Use a Cabeça JS, 13: Dragões de Éter, 7: Turma da Mônica, 8: Use a Cabeça Java
+            const merged = wishlistIds.map((id, idx) => {
+                const found = allBooks.find(b => Number(b.id) === Number(id));
+                return {
+                    id,
+                    title: found?.title || `Livro ${id}`,
+                    author: found?.author || '',
+                    cover: found?.cover || '',
+                    description: found?.description,
+                    addedDate: ['2024-01-20', '2024-01-18', '2024-01-15', '2024-01-12', '2024-01-10'][idx] || null
+                };
+            });
+            setWishlistBooks(merged);
             setLoading(false);
         }, 1000);
     };
@@ -41,12 +49,26 @@ const WishlistPage = () => {
         setWishlistBooks(prev => prev.filter(book => book.id !== bookId));
     };
 
+    const handleBookClick = (bookId) => {
+        const found = wishlistBooks.find(b => Number(b.id) === Number(bookId));
+        navigate(`/book/${bookId}`, { state: { book: found || { id: bookId } } });
+    };
+
     const handleWishlistClick = (e) => {
         e.preventDefault();
         if (isAuthenticated) {
             navigate('/home/user/WishlistPage');
         } else {
             navigate(`/auth/login?next=${encodeURIComponent('/home/user/WishlistPage')}`);
+        }
+    };
+
+    const handleMyLibraryClick = (e) => {
+        e.preventDefault();
+        if (isAuthenticated) {
+            navigate('/home/user/MyLibraryPage');
+        } else {
+            navigate(`/auth/login?next=${encodeURIComponent('/home/user/MyLibraryPage')}`);
         }
     };
 
@@ -86,7 +108,7 @@ const WishlistPage = () => {
                 isAuthenticated={isAuthenticated}
                 user={user}
                 currentPage="wishlist"
-                onMyLibraryClick={() => {}}
+                onMyLibraryClick={handleMyLibraryClick}
                 onWishlistClick={handleWishlistClick}
                 onLogout={handleLogout}
             />
@@ -110,6 +132,7 @@ const WishlistPage = () => {
                             books={wishlistBooks}
                             onRemove={handleRemoveFromWishlist}
                             showRemoveButton={true}
+                            onBookClick={handleBookClick}
                         />
                     ) : (
                         <EmptyState

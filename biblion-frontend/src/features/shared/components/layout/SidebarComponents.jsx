@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Logo = () => (
     <div className="logo">
@@ -19,9 +20,9 @@ const NavigationMenu = ({
     isAuthenticated 
 }) => (
     <nav className="sidebar-nav">
-        <a href="/home/user/HomePage" className={`nav-item ${currentPage === 'home' ? 'active' : ''}`}>
+        <Link to="/home/user/HomePage" className={`nav-item ${currentPage === 'home' ? 'active' : ''}`}>
             Home
-        </a>
+        </Link>
         <a href="#" className={`nav-item ${currentPage === 'library' ? 'active' : ''}`} onClick={onMyLibraryClick}>
             Minha Biblioteca
         </a>
@@ -29,9 +30,9 @@ const NavigationMenu = ({
             Lista de Desejos
         </a>
         {isAuthenticated && (
-            <a href="#" className="nav-item">
+            <Link to="/home/user/DownloadHistoryPage" className="nav-item">
                 Downloads
-            </a>
+            </Link>
         )}
     </nav>
 );
@@ -69,9 +70,9 @@ const SidebarFooter = ({ isAuthenticated, user, onLogout }) => (
                 </a>
             </>
         ) : (
-            <a href="/auth/login" className="nav-item logout">
+            <Link to="/auth/login" className="nav-item logout">
                 Entrar
-            </a>
+            </Link>
         )}
     </div>
 );

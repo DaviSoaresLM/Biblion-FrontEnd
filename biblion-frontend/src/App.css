@@ -30,11 +30,12 @@
 html,
 body {
     min-height: 100vh;
-    width: 100vw;
+    width: 100%; /* usar 100% em vez de 100vw evita scroll horizontal causado pela scrollbar */
     background: var(--colors-background);
     font-family: 'Inter', sans-serif;
     color: var(--colors-main-text);
     height: 100%;
+    overflow-x: hidden; /* prevenir overflow horizontal indesejado */
 }
 
 form {

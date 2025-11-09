@@ -9,11 +9,20 @@ export const authService = {
         if (useMock) {
             // Simula latência
             await sleep(400);
+            // Normaliza e valida entradas mínimas
+            const email = (userData?.email || '').trim().toLowerCase();
+            const password = userData?.password || '';
+
+            if (!email || !password) {
+                const err = new Error('E-mail e senha são obrigatórios');
+                err.status = 400;
+                throw err;
+            }
 
             const usersJson = localStorage.getItem('biblion_users');
             const users = usersJson ? JSON.parse(usersJson) : [];
 
-            const found = users.find(u => u.email === userData.email && u.password === userData.password);
+            const found = users.find(u => (u.email || '').toLowerCase() === email && u.password === password);
 
             if (found) {
                 return {
@@ -23,7 +32,9 @@ export const authService = {
                 };
             }
 
-            throw new Error('Credenciais inválidas');
+            const err = new Error('Credenciais inválidas');
+            err.status = 401;
+            throw err;
         }
 
         try {
@@ -50,19 +61,36 @@ export const authService = {
     register: async (userData) => {
         if (useMock) {
             await sleep(300);
+            // Normaliza e valida apenas o mínimo necessário para o modo mock
+            const email = (userData?.email || '').trim().toLowerCase();
+            const password = userData?.password || '';
+
+            if (!email || !password) {
+                const err = new Error('E-mail e senha são obrigatórios');
+                err.status = 400;
+                throw err;
+            }
+
+            if (password.length < 8) {
+                const err = new Error('A senha deve conter no mínimo 8 caracteres');
+                err.status = 400;
+                throw err;
+            }
 
             const usersJson = localStorage.getItem('biblion_users');
             const users = usersJson ? JSON.parse(usersJson) : [];
 
-            const exists = users.some(u => u.email === userData.email);
+            const exists = users.some(u => (u.email || '').toLowerCase() === email);
             if (exists) {
-                throw new Error('Já existe um usuário cadastrado com este e-mail');
+                const err = new Error('Já existe um usuário cadastrado com este e-mail');
+                err.status = 409;
+                throw err;
             }
 
             const newUser = {
                 id: (users.reduce((m, u) => Math.max(m, u.id || 0), 0) + 1),
-                email: userData.email,
-                password: userData.password,
+                email: email,
+                password: password,
                 firstName: userData.firstName || '',
                 lastName: userData.lastName || '',
                 role: userData.role || 'COMMON'

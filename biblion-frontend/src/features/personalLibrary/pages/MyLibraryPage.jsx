@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth.js';
+import { useBooks } from '../../home/hooks/useBooks.js';
 import { useNavigate } from 'react-router-dom';
-import '../../shared/styles/Homepage.css';
+import '../../shared/styles/HomePage.css';
 
 // Components
 import Sidebar from '../../shared/components/layout/Sidebar.jsx';
@@ -14,6 +15,7 @@ import { LoadingState, EmptyState, AccessRestricted } from '../../shared/compone
 const MyLibraryPage = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
+    const { allBooks } = useBooks();
     const [savedBooks, setSavedBooks] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -25,14 +27,27 @@ const MyLibraryPage = () => {
 
     const loadSavedBooks = () => {
         setTimeout(() => {
-            const mockSavedBooks = [
-                { id: 1, title: "Harry Potter e a Pedra Filosofal", author: "J.K. Rowling", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=HP1", savedDate: "2024-01-15" },
-                { id: 2, title: "O Senhor dos Anéis: A Sociedade do Anel", author: "J.R.R. Tolkien", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=LOTR1", savedDate: "2024-01-10" },
-                { id: 3, title: "Percy Jackson e o Ladrão de Raios", author: "Rick Riordan", cover: "https://via.placeholder.com/150x200/2C3E50/FFFFFF?text=PJ1", savedDate: "2024-01-05" }
-            ];
-            setSavedBooks(mockSavedBooks);
+            // Construir savedBooks diretamente a partir do catálogo
+            const savedIds = [1, 11, 3]; // 
+            const merged = savedIds.map((id, idx) => {
+                const found = allBooks.find(b => Number(b.id) === Number(id));
+                return {
+                    id,
+                    title: found?.title || `Livro ${id}`,
+                    author: found?.author || '',
+                    cover: found?.cover || '',
+                    description: found?.description,
+                    savedDate: ['2024-01-15', '2024-02-01', '2024-01-05'][idx] || null
+                };
+            });
+            setSavedBooks(merged);
             setLoading(false);
         }, 1000);
+    };
+
+    const handleBookClick = (bookId) => {
+        const found = savedBooks.find(b => Number(b.id) === Number(bookId));
+        navigate(`/book/${bookId}`, { state: { book: found || { id: bookId } } });
     };
 
     const handleWishlistClick = (e) => {
@@ -41,6 +56,15 @@ const MyLibraryPage = () => {
             navigate('/home/user/WishlistPage');
         } else {
             navigate(`/auth/login?next=${encodeURIComponent('/home/user/WishlistPage')}`);
+        }
+    };
+
+    const handleMyLibraryClick = (e) => {
+        e.preventDefault();
+        if (isAuthenticated) {
+            navigate('/home/user/MyLibraryPage');
+        } else {
+            navigate(`/auth/login?next=${encodeURIComponent('/home/user/MyLibraryPage')}`);
         }
     };
 
@@ -80,7 +104,7 @@ const MyLibraryPage = () => {
                 isAuthenticated={isAuthenticated}
                 user={user}
                 currentPage="library"
-                onMyLibraryClick={() => {}}
+                onMyLibraryClick={handleMyLibraryClick}
                 onWishlistClick={handleWishlistClick}
                 onLogout={handleLogout}
             />
@@ -100,7 +124,7 @@ const MyLibraryPage = () => {
                     {loading ? (
                         <LoadingState message="Carregando seus livros..." />
                     ) : savedBooks.length > 0 ? (
-                        <BooksGrid books={savedBooks} />
+                        <BooksGrid books={savedBooks} onBookClick={handleBookClick} />
                     ) : (
                         <EmptyState
                             title="Nenhum livro salvo ainda"
