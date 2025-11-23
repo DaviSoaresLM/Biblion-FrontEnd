@@ -24,6 +24,9 @@ const AdminLoginPage = () => {
         setIsLoading(true);
         try {
             const response = await authService.authenticate({ email, password });
+            if (!response || !response.token) {
+                throw new Error('Resposta inválida do servidor ao autenticar');
+            }
             // checa role
             if (response.userRole && response.userRole.toUpperCase() === 'ADMIN') {
                 login(response.token, response.userEmail, response.userRole);

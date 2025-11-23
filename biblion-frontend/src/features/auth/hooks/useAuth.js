@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import authStore from '../../../utils/authStore';
 
 export const useAuth = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -11,16 +12,12 @@ export const useAuth = () => {
 
     const checkAuthStatus = () => {
         try {
-            const token = localStorage.getItem('token');
-            const userEmail = localStorage.getItem('userEmail');
-            const userRole = localStorage.getItem('userRole');
+            const token = authStore.getToken();
+            const storedUser = authStore.getUser();
 
-            if (token && userEmail) {
+            if (token && storedUser && storedUser.email) {
                 setIsAuthenticated(true);
-                setUser({
-                    email: userEmail,
-                    role: userRole
-                });
+                setUser(storedUser);
             } else {
                 setIsAuthenticated(false);
                 setUser(null);
@@ -35,22 +32,16 @@ export const useAuth = () => {
     };
 
     const login = (token, userEmail, userRole) => {
-        localStorage.setItem('token', token);
-        localStorage.setItem('userEmail', userEmail);
-        localStorage.setItem('userRole', userRole);
-        
+        // salvar em sessionStorage via authStore
+        authStore.setToken(token);
+        authStore.setUser({ email: userEmail, role: userRole });
+
         setIsAuthenticated(true);
-        setUser({
-            email: userEmail,
-            role: userRole
-        });
+        setUser({ email: userEmail, role: userRole });
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('userRole');
-        
+        authStore.clearAuth();
         setIsAuthenticated(false);
         setUser(null);
     };

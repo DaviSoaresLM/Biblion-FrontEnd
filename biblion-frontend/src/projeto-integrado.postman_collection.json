@@ -1,0 +1,328 @@
+{
+	"info": {
+		"_postman_id": "c9d435df-fa89-40f9-b1ad-005b80eb14e6",
+		"name": "projeto-integrado",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38230879",
+		"_collection_link": "https://lunar-shuttle-203081.postman.co/workspace/My-Workspace~d21ee601-6181-4e3b-8db4-38742c966718/collection/38048710-c9d435df-fa89-40f9-b1ad-005b80eb14e6?action=share&source=collection_link&creator=38230879"
+	},
+	"item": [
+		{
+			"name": "Registro",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"User\",\r\n    \"lastName\": \"Teste\",\r\n    \"email\": \"teste@gmail.com\",\r\n    \"password\": \"Teste123\",\r\n    \"role\": \"COMMON\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/auth/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.environment.set(\"token\", response.accessToken);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"admin@gmail.com\",\r\n    \"password\": \"admin123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/auth/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "registrar-livro",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "data",
+							"value": "{\n    \"title\": \"Duna\",\n    \"isbn\": \"1234567890122\",\n    \"author\": \"Frank Herbert\",\n    \"description\": \"Lorem Ipsum\",\n    \"year\": \"1965\",\n    \"bookTypeId\": 1,\n    \"genres\": [\n        \"Aventura\",\n        \"Ação\"\n    ],\n    \"copiesAvailable\": 5\n}",
+							"contentType": "application/json",
+							"type": "text"
+						},
+						{
+							"key": "pdf",
+							"contentType": "application/pdf",
+							"type": "file",
+							"src": "/C:/Users/gener/Desktop/pdfs/05b4c172-4030-4655-bd3e-7dddb82c5d6a.pdf"
+						},
+						{
+							"key": "image",
+							"contentType": "application/jpeg",
+							"type": "file",
+							"src": "/C:/Users/gener/Downloads/still-life-books-versus-technology (1).jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/books",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"books"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "buscas-livro",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/books",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"books"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "atualizar-livro",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "data",
+							"value": "{\n    \"title\": \"Harry Potter e a Pedra Filosofal\",\n    \"author\": \"J. K. Rowling\",\n    \"description\": \"Lorem\",\n    \"year\": 2001,\n    \"copiesToAdd\": 5,\n    \"genres\": [\n        \"Aventura\", \"Ação\"\n    ]\n}",
+							"contentType": "application/json",
+							"type": "text"
+						},
+						{
+							"key": "pdf",
+							"contentType": "application/pdf",
+							"type": "file",
+							"src": "/C:/Users/Ariel/Downloads/seginfo-08-contr-tecs.pdf"
+						},
+						{
+							"key": "image",
+							"contentType": "application/jpeg",
+							"type": "file",
+							"src": "/C:/Users/Ariel/Downloads/81zN7udGRUL._SL1500_.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/books/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"books",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deletarLivro",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/books/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"books",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "download-pdf",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/downloads/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"downloads",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUserHistoric",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/downloads",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"downloads"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

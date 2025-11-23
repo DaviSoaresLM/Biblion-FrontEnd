@@ -1,57 +1,83 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { BookService } from '../services/BookService.js';
+import React from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import '../../shared/styles/HomePage.css';
+import './styles/PDFReader.css';
 import { useAuth } from '../../auth/hooks/useAuth.js';
 import Sidebar from '../../shared/components/layout/Sidebar.jsx';
 import PageHeader from '../../shared/components/layout/PageHeader.jsx';
 import { PageLayout, MainLayout, SectionLayout } from '../../shared/components/layout/LayoutComponents.jsx';
+import useNavigationActions from '../hooks/useNavigationActions.js';
+import usePdfReader from '../hooks/usePdfReader.js';
+import PDFReaderToolbar from '../components/PDFReaderToolbar.jsx';
+import PDFContainer from '../../shared/components/ui/PDFContainer.jsx';
 
 const PDFReaderPage = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
     const location = useLocation();
-    const [loading, setLoading] = useState(true);
-    const [pdfUrl, setPdfUrl] = useState(null);
-    const [title, setTitle] = useState('Leitor de PDF');
+    const { handleMyLibraryClick, handleWishlistClick, handleLogout, navigate } = useNavigationActions();
+    const { isAuthenticated, user } = useAuth();
 
-    useEffect(() => {
-        let mounted = true;
+    const {
+        loading,
+        pdfUrl,
+        title,
+        textMode,
+        toggleTextMode,
+        twoColumns,
+        toggleTwoColumns,
+        zoom,
+        setZoom,
+        textContent,
+        book
+    } = usePdfReader(id, location.search, location.state);
 
-        (async () => {
-            try {
-                setLoading(true);
+    const paramsNow = new URLSearchParams(location.search);
+    const srcParamNow = paramsNow.get('src');
 
-                // Permite ?src=... para testes locais sem backend
-                const params = new URLSearchParams(location.search);
-                const srcParam = params.get('src');
-                if (srcParam) {
-                    setPdfUrl(srcParam);
-                    setTitle(params.get('title') || 'Leitor de PDF');
-                    return;
-                }
+    // Se houver PDF, src ou texto, renderizar modo leitor em tela cheia (navbar fina + iframe)
+    const shouldShowReaderFullscreen = !!(srcParamNow || pdfUrl || textContent);
 
-                const book = await BookService.getBook(id);
-                if (!mounted) return;
-                if (book) {
-                    setTitle(book.title || 'Leitor de PDF');
-                    setPdfUrl(book.pdf || book.pdfPath || book.pdfUrl || null);
-                }
-            } catch (err) {
-                console.warn('Erro ao carregar livro para leitura:', err);
-            } finally {
-                if (mounted) setLoading(false);
-            }
-        })();
+    if (shouldShowReaderFullscreen) {
+        return (
+            <div className="reader-fullscreen">
+                <header className="reader-navbar">
+                    <div className="nav-left">
+                        <button className="small-btn" onClick={() => navigate(-1)}>Voltar</button>
+                    </div>
+                    <div className="nav-center">
+                        <strong className="reader-title">{title}</strong>
+                    </div>
+                    <div className="nav-right" />
+                </header>
 
-        return () => { mounted = false; };
-    }, [id, location.search]);
+                <div className="reader-fullbody">
+                    <PDFContainer loading={loading} pdfUrl={pdfUrl || srcParamNow} textMode={textMode} textContent={textContent} twoColumns={twoColumns} zoom={zoom} />
+                </div>
+            </div>
+        );
+    }
 
-    const { isAuthenticated, user, logout } = useAuth();
+    // early-return: se já carregou e não há book, src nem pdfUrl, exibe mensagem simples
+    if (!loading && !srcParamNow && !book && !pdfUrl) {
+        return (
+            <PageLayout>
+                <Sidebar isAuthenticated={isAuthenticated} user={user} currentPage="home" onMyLibraryClick={handleMyLibraryClick} onWishlistClick={handleWishlistClick} onLogout={handleLogout} />
 
-    const handleMyLibraryClick = (e) => { e && e.preventDefault(); if (isAuthenticated) navigate('/home/user/MyLibraryPage'); else navigate(`/auth/login?next=${encodeURIComponent('/home/user/MyLibraryPage')}`); };
-    const handleWishlistClick = (e) => { e && e.preventDefault(); if (isAuthenticated) navigate('/home/user/WishlistPage'); else navigate(`/auth/login?next=${encodeURIComponent('/home/user/WishlistPage')}`); };
-    const handleLogout = (e) => { e && e.preventDefault(); logout(); navigate('/auth/login'); };
+                <MainLayout>
+                    <PageHeader title={'Livro não encontrado'} subtitle={''} />
+                    <SectionLayout>
+                        <main className="not-found">
+                            <h3>Livro não encontrado</h3>
+                            <p>Não foi possível localizar este livro para leitura.</p>
+                            <div style={{ marginTop: 18 }}>
+                                <button className="load-more-btn" onClick={() => navigate('/home/user/HomePage')}>Voltar para a biblioteca</button>
+                            </div>
+                        </main>
+                    </SectionLayout>
+                </MainLayout>
+            </PageLayout>
+        );
+    }
 
     return (
         <PageLayout>
@@ -61,23 +87,22 @@ const PDFReaderPage = () => {
                 <PageHeader title={title} subtitle="Leitor de PDF" />
 
                 <SectionLayout>
-                    <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                            <button className="pagination-btn" onClick={() => navigate(-1)}>Fechar</button>
-                        </div>
-                        <div>
-                            {!loading && pdfUrl ? <a className="search-button" href={pdfUrl} target="_blank" rel="noreferrer">Abrir original</a> : null}
-                        </div>
-                    </div>
+                    <div className="pdf-reader-wrapper">
+                        <div className="book-page">
+                            <PDFReaderToolbar
+                                onBack={() => navigate(-1)}
+                                onOpenOriginal={pdfUrl}
+                                hasPdf={!loading && !!pdfUrl}
+                                textMode={textMode}
+                                toggleTextMode={toggleTextMode}
+                                twoColumns={twoColumns}
+                                toggleTwoColumns={toggleTwoColumns}
+                                zoom={zoom}
+                                setZoom={setZoom}
+                            />
 
-                    <div style={{ height: '72vh', border: '1px solid #eee' }}>
-                        {loading ? (
-                            <div style={{ padding: 20 }}>Carregando...</div>
-                        ) : !pdfUrl ? (
-                            <div style={{ padding: 20 }}>PDF não disponível para este livro.</div>
-                        ) : (
-                            <iframe title={`Leitor - ${title}`} src={pdfUrl} style={{ width: '100%', height: '100%', border: 'none' }} />
-                        )}
+                            <PDFContainer loading={loading} pdfUrl={pdfUrl} textMode={textMode} textContent={textContent} twoColumns={twoColumns} zoom={zoom} />
+                        </div>
                     </div>
                 </SectionLayout>
             </MainLayout>

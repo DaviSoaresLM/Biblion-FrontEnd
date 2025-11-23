@@ -49,6 +49,10 @@ const LoginPage = () => {
         try {
             const response = await authService.authenticate(userData);
 
+            if (!response || !response.token) {
+                throw new Error('Resposta inválida do servidor ao autenticar');
+            }
+
             // Usar o hook de autenticação para fazer login
             login(response.token, response.userEmail, response.userRole);
 

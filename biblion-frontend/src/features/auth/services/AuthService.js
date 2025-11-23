@@ -40,8 +40,27 @@ export const authService = {
         try {
             const response = await api.post("/auth/login", userData);
 
-            if (response.status === 201) {
-                return response.data;
+            // Aceita qualquer 2xx e normaliza formatos diferentes
+            if (response && response.status >= 200 && response.status < 300) {
+                const data = response.data || {};
+
+                // backend retorna { accessToken, userData }
+                if (data.accessToken) {
+                    return {
+                        token: data.accessToken,
+                        userEmail: data.userData?.email ?? null,
+                        userRole: data.userData?.role ?? data.userData?.authority ?? null,
+                        raw: data
+                    };
+                }
+
+                // se já estiver no formato esperado, ou mapear campos conhecidos
+                return {
+                    token: data.token ?? data.accessToken ?? null,
+                    userEmail: data.userEmail ?? data.user?.email ?? data.userData?.email ?? null,
+                    userRole: data.userRole ?? data.user?.role ?? data.userData?.role ?? null,
+                    raw: data
+                };
             }
         } catch (error) {
             const errorData = error?.response?.data || {};
@@ -105,7 +124,7 @@ export const authService = {
         try {
             const response = await api.post("/auth/register", userData);
 
-            if (response.status === 201) {
+            if (response && response.status >= 200 && response.status < 300) {
                 return response.data;
             }
         } catch (error) {
