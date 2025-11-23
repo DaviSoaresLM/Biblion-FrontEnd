@@ -95,7 +95,32 @@ const BookDetailsPage = () => {
                                 </p>
 
                                 <div style={{ marginTop: 22, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                                    <button className="search-button" onClick={() => alert('Download simulado (não implementado)')}>Baixar PDF</button>
+                                    {/* Ler agora: navega para o leitor de PDF */}
+                                    <button
+                                        className="search-button"
+                                        onClick={() => {
+                                            const pdfUrl = book.pdf || book.pdfPath || book.pdfUrl || null;
+                                            if (pdfUrl) {
+                                                navigate(`/book/${bookId}/read`);
+                                            } else {
+                                                alert('PDF não disponível para este livro');
+                                            }
+                                        }}
+                                    >
+                                        Ler Agora
+                                    </button>
+
+                                    <button
+                                        className="search-button"
+                                        onClick={() => {
+                                            const pdfUrl = book.pdf || book.pdfPath || book.pdfUrl || null;
+                                            if (pdfUrl) window.open(pdfUrl, '_blank');
+                                            else alert('PDF não disponível para download');
+                                        }}
+                                    >
+                                        Baixar PDF
+                                    </button>
+
                                     <button className="pagination-btn" onClick={() => navigate(-1)}>Voltar</button>
                                 </div>
                             </div>
