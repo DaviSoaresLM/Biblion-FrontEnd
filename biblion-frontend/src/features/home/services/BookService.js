@@ -9,33 +9,36 @@ import api from '../../../config/AxiosConfig.jsx';
  */
 export const BookService = {
     async listBooks() {
-        const res = await api.get('/api/admin/books');
+        // admin: GET /books
+        const res = await api.get('/books');
         return res.data;
     },
 
     async getBook(id) {
-        const res = await api.get(`/api/books/${id}`);
+        // public details: GET /books/details?id={id}
+        const res = await api.get('/books/details', { params: { id } });
         return res.data;
     },
 
     async listPreviewBooks() {
-        const res = await api.get('/api/books/preview');
+        // public preview list: GET /books/home
+        const res = await api.get('/books/home');
         return res.data;
     },
 
     async createBook(payload) {
-        // payload pode ser FormData ou objeto simples
-        const res = await api.post('/api/admin/books', payload);
+        // payload deve ser FormData com 'data' JSON + pdf + image
+        const res = await api.post('/books', payload);
         return res.data;
     },
 
     async updateBook(id, payload) {
-        const res = await api.put(`/api/admin/books/${id}`, payload);
+        const res = await api.put(`/books/${id}`, payload);
         return res.data;
     },
 
     async deleteBook(id) {
-        const res = await api.delete(`/api/admin/books/${id}`);
+        const res = await api.delete(`/books/${id}`);
         return res.data;
     }
 };

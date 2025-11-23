@@ -22,8 +22,8 @@ const DownloadHistoryPage = () => {
         (async () => {
             if (!isAuthenticated) return;
             try {
-                // Tenta carregar histórico do backend; endpoint esperado: GET /api/user/downloads
-                const res = await api.get('/api/user/downloads');
+                // Tenta carregar histórico do backend; endpoint: GET /downloads
+                const res = await api.get('/downloads');
                 if (!mounted) return;
                 setHistory(Array.isArray(res.data) ? res.data : []);
             } catch (err) {
